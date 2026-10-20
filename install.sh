@@ -443,6 +443,12 @@ check_forked() {
 				esac
 			fi
 		fi
+	elif [ "$lsb_dist" = "amzn" ]; then
+		# Get undistinguished distro from space-separated "ID_LIKE" field
+		lsb_dist="$(. /etc/os-release && printf "$ID_LIKE" | awk '{print $1}')"
+
+		# Get version from platform (al*), since it might conflict with non-forked versioning
+		dist_version="$(. /etc/os-release && echo "${PLATFORM_ID#*:}")"}
 	fi
 }
 
@@ -579,6 +585,11 @@ do_install() {
 			;;
 		ubuntu.questing|ubuntu.oracular|ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
 			deprecation_notice "$lsb_dist" "$dist_version"
+			;;
+		fedora.al*)
+			if [ "$dist_version" = "al2" ]; then
+				deprecation_notice "$lsb_dist" "$dist_version"
+			fi
 			;;
 		fedora.*)
 			if [ "$dist_version" -lt 43 ]; then
